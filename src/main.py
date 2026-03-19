@@ -4,33 +4,7 @@ import pygame
 from sys import exit 
 import os 
 
-# game varibles
-WINDOW_WIDTH = 512 
-WINDOW_HEIGHT = 512
-
-TILE_SIZE = 32 
-
-PLAYER_X = WINDOW_WIDTH / 2 
-PLAYER_Y = WINDOW_HEIGHT / 2
-
-# maintaining 7 to 8 ratio of image 
-PLAYER_WIDTH = 42 
-PLAYER_HEIGHT = 48 
-
-PLAYER_JUMP_WIDTH = 52 
-PLAYER_JUMP_HEIGHT = 60
-
-PLAYER_DISTANCE = 5
-
-GRAVITY = 0.5
-FRICTION = 0.4 
-
-PLAYER_VELOCITY_X = 5
-PLAYER_VELOCITY_Y = -11     # for jumping upwards
-
-# enemy variables 
-METALL_WIDTH = 36
-METALL_HEIGHT = 30 
+from constants import *
 
 # initilaize pygame
 pygame.init()   # always need to initialize pygame
