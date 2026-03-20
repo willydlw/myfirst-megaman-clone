@@ -1,6 +1,6 @@
 import unittest 
 
-from vector2d import Vector2D 
+from src import Vector2D 
 
 class TestVector2D(unittest.TestCase):
     def setUp(self):

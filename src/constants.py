@@ -1,3 +1,6 @@
+# Configuration File Path 
+ASSETS_CONFIG_PATH = "assets.json"
+
 # game varibles
 SCREEN_WIDTH = 512 
 SCREEN_HEIGHT = 512

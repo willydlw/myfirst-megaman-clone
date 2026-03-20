@@ -1,0 +1,10 @@
+{
+    "images": {
+        "megaman_left":  "assets/images/megaman-left.png",
+        "megaman_right": "assets/images/megaman-right.png",
+        "background": "assets/images/background.png"
+    },
+    "fonts": {
+        "megaman_font": {"path": "assets/fonts/megaman-game-font.otf", "size": 48}
+    }
+}

@@ -1,3 +1,4 @@
+"""
 # Tutorial 9: Enemies
 
 import pygame
@@ -198,10 +199,14 @@ while True:
     pygame.display.update()
     clock.tick(60) # 60 frames per second
 
+"""
+
+from src import Game 
 
 def main():
     print("Hello from myfirst-megaman-clone!")
-    print(f"pygame version: {pygame.version.ver}")
+    game = Game()
+    game.load_resources()
 
 if __name__ == "__main__":
     main()

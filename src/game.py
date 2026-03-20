@@ -1,8 +1,8 @@
 import pygame 
 import sys 
 
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BACKGROUND_COLOR
-from assets import Assets
+from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BACKGROUND_COLOR, ASSETS_CONFIG_PATH
+from .assets import Assets
 
 class Game:
     def __init__(self):
@@ -11,17 +11,16 @@ class Game:
 
         # 2. Set up the display
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.clock = pygame.tick.Clock() 
+        self.clock = pygame.time.Clock() 
         self.running = True 
 
         # 3. Create the Assets manager and load resources 
         self.assets = Assets()
-        self.load_game_resources()
+        self.load_resources()
     
-    def load_game_resources(self):
+    def load_resources(self):
         """Centralized method to load all files at startup."""
-        self.assets.load_image("image_name", "image_path")
-        self.assets.load_font("font_name", "font_path")
+        self.assets.load_all(ASSETS_CONFIG_PATH)
 
     def run(self):
         """The main game loop."""
