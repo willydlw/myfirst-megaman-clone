@@ -3,6 +3,13 @@ import json
 import pygame 
 from pathlib import Path
 
+import logging 
+
+# create a logger named "assetManager" (the filename)
+# Automatically sends its messages up to the Root logger
+# configured in main.py 
+logger = logging.getLogger(__name__)
+
 
 class AssetManager:
     def __init__(self):
@@ -11,6 +18,7 @@ class AssetManager:
         self.fonts = {} 
 
     def load_all(self, config_path):
+        logger.info("Loading assets...")
         # 1. Setup base directory (One level up from where this script resides)
         # .resolve() gets the absolute path, .parent is the script's folder,
         # and the second .parent goe up one more level 

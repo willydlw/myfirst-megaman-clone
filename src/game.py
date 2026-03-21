@@ -14,6 +14,7 @@ class Game:
         self.clock = pygame.time.Clock() 
         self.running = True 
 
+
         # 3. Create the Assets manager and load resources 
         self.assets = AssetManager()
         self.load_resources()
