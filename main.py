@@ -206,7 +206,6 @@ from src import Game
 def main():
     print("Hello from myfirst-megaman-clone!")
     game = Game()
-    game.load_resources()
 
 if __name__ == "__main__":
     main()

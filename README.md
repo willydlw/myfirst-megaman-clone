@@ -1,3 +1,29 @@
+### Learning Journey 
+
+What new things did I learn?
+
+#### __init__.py 
+
+- Package Recognition: Adding an __init__.py file to a directory marks the directory as a regular python package. This makes the modules in this directory explicitly importable. 
+
+- Initialization Code: Any code in the __init__.py file is executed once, the first time the package (or any module within it) is imported. This is a good place to 
+    - Define package-level variables and constants.
+    - Set up configurations
+    - Perform setup tasks
+
+- Simplified Imports/Defining the Public API: The file can be used to control the package's namespace and simplify access for users. By importing specfic functions or classes into the __init__.py's namespace, users can access them directly form the package name, rather than needing to navigate the internal module structure.
+    - Example: Instead of ```from mypackage.mymodule import my_function```, you can add from ```.mymodule import my_function``` to ```mypackage/__init__.py```, allowing users to simply use ```from mypackage import my_function``` 
+
+- Controlling from package import * behavior. By defining the special ```__all__``` variable in ```__init__.py```, you can explicitly specify which modules or names should be imported when a wildcard import(*) is used.
+
+
+#### Fallback Images and Font
+
+If an image fails to load, a brigh magenta surface is created as fallback. Helpful because (1) draw loops won't fail because self.image[name] will always contain a valid pygame surface. (2) Visual debugging: If you see a bright pink box while testing, you instantly know which asset has a broken path.
+
+If a font fails to load, the fallback is a system font.
+
+
 ### Game Class 
 
 Encapsulates the game's state, simplifies the main loop, and ensures that resources like images and fonts are handled systematically.

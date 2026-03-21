@@ -2,7 +2,7 @@ import pygame
 import sys 
 
 from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BACKGROUND_COLOR, ASSETS_CONFIG_PATH
-from .assets import Assets
+from .assetManager import AssetManager
 
 class Game:
     def __init__(self):
@@ -15,7 +15,7 @@ class Game:
         self.running = True 
 
         # 3. Create the Assets manager and load resources 
-        self.assets = Assets()
+        self.assets = AssetManager()
         self.load_resources()
     
     def load_resources(self):
