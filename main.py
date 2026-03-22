@@ -200,6 +200,7 @@ while True:
     clock.tick(60) # 60 frames per second
 
 """
+import pygame
 import sys 
 import logging 
 from pathlib import Path 
@@ -247,9 +248,15 @@ def main():
     logger = logging.getLogger(__name__) # create a logger for this file
     logger.info(f"Log file initialized at: {LOG_FILE}")
 
-    # 5. Create game object
-    game = Game()
+    # 5. Start the game
+    try:
+        game = Game() 
+        game.run()
+    finally:
+        # This blocks runs no matter what (even if the game crashes)
+        pygame.quit()
+        sys.exit()
 
-
+    
 if __name__ == "__main__":
     main()

@@ -1,11 +1,21 @@
 import pygame 
 import sys 
+import logging 
 
 from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BACKGROUND_COLOR, ASSETS_CONFIG_PATH
 from .assetManager import AssetManager
 
+# create a logger named "game" (the filename)
+# Automatically sends its messages up to the Root logger
+# configured in main.py 
+logger = logging.getLogger(__name__)
+
+
 class Game:
     def __init__(self):
+        
+        logger.info("Initializing Game object")
+
         # 1. Initialize pygame modules 
         pygame.init() 
 
@@ -23,11 +33,10 @@ class Game:
         """The main game loop."""
         while self.running:
             self.handle_events()
-            self.update()
+            #self.update()
             self.draw() 
             self.clock.tick(FPS)
-        pygame.quit()
-        sys.exit() 
+
 
     def handle_events(self):
         for event in pygame.event.get():
