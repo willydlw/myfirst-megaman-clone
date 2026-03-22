@@ -2,8 +2,10 @@ import pygame
 import sys 
 import logging 
 
-from .constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, BACKGROUND_COLOR, ASSETS_CONFIG_PATH
+from . import constants as c
+
 from .assetManager import AssetManager
+from .player import Player 
 
 # create a logger named "game" (the filename)
 # Automatically sends its messages up to the Root logger
@@ -20,13 +22,16 @@ class Game:
         pygame.init() 
 
         # 2. Set up the display
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen = pygame.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
         self.clock = pygame.time.Clock() 
         self.running = True 
 
 
         # 3. Load all assets 
-        AssetManager.load_all(ASSETS_CONFIG_PATH)
+        AssetManager.load_all(c.ASSETS_CONFIG_PATH)
+
+        # 4. Set up player 
+        self.player = Player(c.PLAYER_START_X, c.PLAYER_START_Y)
        
 
     def run(self):
@@ -35,7 +40,7 @@ class Game:
             self.handle_events()
             #self.update()
             self.draw() 
-            self.clock.tick(FPS)
+            self.clock.tick(c.FPS)
 
 
     def handle_events(self):
@@ -43,9 +48,20 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False 
 
-    def draw(self):
-        self.screen.fill(BACKGROUND_COLOR)
+            keys = pygame.key.get_pressed() 
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                logger.info("UP arrow or w key pressed")
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                logger.info("DOWN arrow or s key pressed")
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                logger.info("LEFT arrow or a key pressed")
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                logger.info("RIGHT arrow or d key pressed")
+    
 
+    def draw(self):
+        self.screen.fill(c.BACKGROUND_COLOR)
+        self.player.draw_debug(self.screen)
         pygame.display.flip()
 
 if __name__ == "__main__":

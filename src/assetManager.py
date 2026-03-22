@@ -18,18 +18,14 @@ class AssetManager:
 
     @classmethod 
     def load_all(cls, config_path):
-        logger.info("Loading assets...")
+        logger.info(f"Loading assets, config_path: {config_path}")
 
         # 1. Setup base directory (One level up from where this script resides)
         # .resolve() gets the absolute path, .parent is the script's folder,
         # and the second .parent goe up one more level 
         BASE_DIR = Path(__file__).resolve().parent.parent 
 
-        print(f"config_path: {config_path}")
-        print(f"BASE_DIR: {BASE_DIR}")
-
-
-        # 2. Load Config 
+        # 2. Load json configuration file
         try:
             # Join BASE_DIR with the config_path provided 
             full_config_path = BASE_DIR / config_path
@@ -40,9 +36,23 @@ class AssetManager:
             return 
         
         # 3. Load Images 
-        for name, relative_path in config.get("images", {}).items():
-            full_path = BASE_DIR / relative_path 
-            cls._images[name] = cls._safe_load_image(full_path)
+        for name, data in config.get("images", {}).items():
+            if isinstance(data, dict):
+                path = data.get("path")
+                scale = data.get("scale")
+            else:
+                path = data 
+                scale = None 
+
+            full_path = BASE_DIR / path 
+            img = cls._safe_load_image(full_path)
+
+            # scale only once, when loading 
+            if scale:
+                logger.info(f"scaling image {name}, scale: {scale[0]}, {scale[1]}")
+                img = pygame.transform.scale(img, (scale[0], scale[1]))
+
+            cls._images[name] = img 
 
         # 4. Load fonts 
         for name, data in config.get("fonts", {}).items():

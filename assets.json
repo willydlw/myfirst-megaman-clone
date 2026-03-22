@@ -1,7 +1,9 @@
 {
     "images": {
-        "megaman_left":  "assets/images/megaman-left.png",
-        "megaman_right": "assets/images/megaman-right.png",
+        "player_left":  { "path": "assets/images/megaman-left.png",  "scale": [42, 48]},
+        "player_right": { "path": "assets/images/megaman-right.png", "scale": [42, 48]},
+        "player_jump_left": {"path": "assets/images/megaman-left-jump.png", "scale": [52, 60]},
+        "player_jump_right": {"path": "assets/images/megaman-right-jump.png", "scale": [52, 60]},
         "background": "assets/images/background.png"
     },
     "fonts": {

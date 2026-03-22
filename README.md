@@ -24,6 +24,22 @@ If an image fails to load, a brigh magenta surface is created as fallback. Helpf
 If a font fails to load, the fallback is a system font.
 
 
+#### Scaling Images 
+
+Megaman Images
+
+megaman-left.png and megaman-right.png are 210 x 240 pixels. Ratio is 7:8 
+
+megaman-left-jump.png and megaman-right-jump.png are 260 x 300 pixels. Ratio is 13:15
+
+The player standing and jumping images are different sizes. This can cause collision issues when switching from jumping to standing. The player hitbox constant is the smaller of the two sizes: 42 x 48.
+
+Floor tiles: floor-tile.png is 160 x 160 pixels. Ratio is 1:1
+
+
+
+
+
 ### Game Class 
 
 Encapsulates the game's state, simplifies the main loop, and ensures that resources like images and fonts are handled systematically.
