@@ -4,7 +4,8 @@
         "player_right": { "path": "assets/images/megaman-right.png", "scale": [42, 48]},
         "player_jump_left": {"path": "assets/images/megaman-left-jump.png", "scale": [52, 60]},
         "player_jump_right": {"path": "assets/images/megaman-right-jump.png", "scale": [52, 60]},
-        "background": "assets/images/background.png"
+        "floor_tile": {"path": "assets/images/floor-tile.png", "scale" : [32, 32]},
+        "background" : "assets/images/background.png"
     },
     "fonts": {
         "megaman_font": {"path": "assets/fonts/megaman-game-font.otf", "size": 48}

@@ -6,6 +6,7 @@ from . import constants as c
 
 from .assetManager import AssetManager
 from .player import Player 
+from .tile import Tile 
 
 # create a logger named "game" (the filename)
 # Automatically sends its messages up to the Root logger
@@ -26,13 +27,51 @@ class Game:
         self.clock = pygame.time.Clock() 
         self.running = True 
 
+        # Create a group for collision tiles 
+        self.tiles = pygame.sprite.Group()
 
-        # 3. Load all assets 
+        # 3. Load asset and then create the mape
         AssetManager.load_all(c.ASSETS_CONFIG_PATH)
+        self.setup_level()
 
         # 4. Set up player 
         self.player = Player(c.PLAYER_START_X, c.PLAYER_START_Y)
-       
+
+        # 5. Setup background 
+        self.background_image = AssetManager.get_image("background")
+    
+
+    def setup_level(self):
+        # 'X' represents a floor tile, ' ' is empty space
+        level_map = [
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "                ",
+            "    XXXX        ",
+            "                ",
+            "XXXXXXXXXXXXXXXX",
+            "                "
+        ]
+
+        floor_tile_image = AssetManager.get_image("floor_tile")
+
+        for row_idx, row in enumerate(level_map):
+            for col_idx, cell in enumerate(row):
+                if cell == "X":
+                    x = col_idx * c.TILE_SIZE
+                    y = row_idx * c.TILE_SIZE 
+                    tile = Tile(x, y, floor_tile_image)
+                    self.tiles.add(tile)
+
 
     def run(self):
         """The main game loop."""
@@ -61,6 +100,7 @@ class Game:
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
+        self.tiles.draw(self.screen)
         self.player.draw_debug(self.screen)
         pygame.display.flip()
 
