@@ -28,9 +28,6 @@ class Player(pygame.sprite.Sprite):
         # self.hitbox is for Collisions
         self.hitbox = pygame.Rect(x, y, c.PLAYER_HITBOX_WIDTH, c.PLAYER_HITBOX_HEIGHT)
 
-        # Create the rectangle from the image's dimensions
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
 
         # movement variables
         self.velocity = Vector2(0, 0)
@@ -53,6 +50,10 @@ class Player(pygame.sprite.Sprite):
 
         # align the drawing rect to the hitbox 
         # using midbottom keeps the player anchored to the floor correctly
+        # If jumping sprite is taller than standing sprite, player's feet stay 
+        # locked to the same point on the ground rather than keeping player's 
+        # head at the same height and potentially sinking through the ground 
+        # or being above the ground
         self.rect.midbottom = self.hitbox.midbottom 
 
     
