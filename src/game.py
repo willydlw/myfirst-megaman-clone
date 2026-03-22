@@ -100,7 +100,14 @@ class Game:
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
+
+        # draw the level tiles
         self.tiles.draw(self.screen)
+
+        # draw megaman image
+        self.screen.blit(self.player.image, self.player.rect)
+
+        # draw debug boxes (optional, for troubleshooting)
         self.player.draw_debug(self.screen)
         pygame.display.flip()
 
