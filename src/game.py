@@ -15,13 +15,9 @@ class Game:
         self.running = True 
 
 
-        # 3. Create the Assets manager and load resources 
-        self.assets = AssetManager()
-        self.load_resources()
-    
-    def load_resources(self):
-        """Centralized method to load all files at startup."""
-        self.assets.load_all(ASSETS_CONFIG_PATH)
+        # 3. Load all assets 
+        AssetManager.load_all(ASSETS_CONFIG_PATH)
+       
 
     def run(self):
         """The main game loop."""
