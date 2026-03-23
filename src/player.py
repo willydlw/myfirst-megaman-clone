@@ -17,8 +17,6 @@ class Player(pygame.sprite.Sprite):
         # call the Sprite parent constructor
         super().__init__()
 
-        logger.info("Returned from calling Sprite parent constructor")
-
         # Movement variables 
         self.position = Vector2(x,y)
         self.velocity = Vector2(0, 0)
@@ -49,6 +47,8 @@ class Player(pygame.sprite.Sprite):
         self.animations = {
             "idle_right": [AssetManager.get_image("player_right")],
             "idle_left":  [AssetManager.get_image("player_left")],
+            "jump_right": [AssetManager.get_image("player_jump_right")],
+            "jump_left":  [AssetManager.get_image("player_jump_left")],
             "walk_right": self.walk_right_frames,
             "walk_left":  self.walk_left_frames
         }
@@ -65,7 +65,7 @@ class Player(pygame.sprite.Sprite):
         # self.rect is for Drawing (matches the current image size)
         self.rect = self.image.get_rect(midbottom=self.hitbox.midbottom)
 
-      
+        logger.info("Player initialized")      
 
 
     def draw_debug(self, surface):
@@ -81,7 +81,9 @@ class Player(pygame.sprite.Sprite):
         now = pygame.time.get_ticks() 
 
         # 1. Determine the state 
-        if moving_this_frame and abs(self.velocity.x) > c.MIN_SPEED and not self.jumping:
+        if self.jumping:
+            state = "jump_" + self.direction 
+        elif moving_this_frame and abs(self.velocity.x) > c.MIN_SPEED:
             state = "walk_" + self.direction 
         else:
             state = "idle_" + self.direction 
@@ -100,15 +102,12 @@ class Player(pygame.sprite.Sprite):
             
             self.image = current_frames[self.frame_index]
 
-       
-
 
     def jump(self):
         # only allow a jump if the player is not already jumping 
         if not self.jumping:
             self.velocity.y = -c.JUMP_STRENGTH 
             self.jumping = True 
-            logger.info("Player jumped")
 
 
     def update(self, tiles, moving):
@@ -171,9 +170,6 @@ class Player(pygame.sprite.Sprite):
         #    Ensure that feet stay anchored to bottom of collision box 
         #    when image size changes (jumping versus standing)
         self.rect.midbottom = self.hitbox.midbottom 
-
-        if self.velocity.x != 0:
-            logging.debug(f"dir: {self.direction} | Vel: ({self.velocity.x:.2f}, {self.velocity.y:.2f}), Pos: ({self.hitbox.x}, {self.hitbox.y})")
 
 
     def __repr__(self):
