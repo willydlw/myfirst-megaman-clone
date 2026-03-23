@@ -36,6 +36,7 @@ class Game:
 
         # 4. Set up player 
         self.player = Player(c.PLAYER_START_X, c.PLAYER_START_Y)
+        self.player_moving_this_frame = False 
 
         # 5. Setup background 
         self.background_image = AssetManager.get_image("background")
@@ -56,7 +57,7 @@ class Game:
             "                ",
             "                ",
             "                ",
-            "    XXXX        ",
+            "                ",
             "                ",
             "XXXXXXXXXXXXXXXX",
             "                "
@@ -77,26 +78,40 @@ class Game:
         """The main game loop."""
         while self.running:
             self.handle_events()
-            #self.update()
+            self.update()
             self.draw() 
             self.clock.tick(c.FPS)
 
 
     def handle_events(self):
+        moving = False      # Track is keys are held this frame
+
+        # Handle "one-time" events (Closing window, single-press Jump)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False 
 
-            keys = pygame.key.get_pressed() 
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-                logger.info("UP arrow or w key pressed")
-            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-                logger.info("DOWN arrow or s key pressed")
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                logger.info("LEFT arrow or a key pressed")
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                logger.info("RIGHT arrow or d key pressed")
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE or event.key == pygame.K_w:
+                    self.player.jump() 
+
+        # Handle continuous movement events 
+        keys = pygame.key.get_pressed() 
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.player.velocity.x -= c.ACCELERATION
+            self.player.direction = "left"
+            moving = True 
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.player.velocity.x += c.ACCELERATION
+            self.player.direction = "right"
+            moving = True 
+        
+        self.player_moving_this_frame = moving 
     
+
+    def update(self):
+        self.player.update(self.tiles, self.player_moving_this_frame)
+
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
@@ -111,6 +126,3 @@ class Game:
         self.player.draw_debug(self.screen)
         pygame.display.flip()
 
-if __name__ == "__main__":
-    my_game = Game()
-    my_game.run()
