@@ -5,13 +5,13 @@
 3   Rock Tile 3
 4   Rock Tile 4
 5   Floor Tile
-6
-7 
-8
-9
-10
-11
-12 
+6   Wall Tile
+7   Beam Tile 
+8   Spike Tile
+9   Door Tile
+10  Room Tile
+11  Metall
+12  Blader
 """
 
 

@@ -63,15 +63,27 @@ class Game:
                 if code == c.SKY: # pygame window background color
                     continue    
                 elif code == c.ROCK_TILE_1:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_1")))
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_1"), code))
                 elif code == c.ROCK_TILE_2:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_2")))
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_2"), code))
                 elif code == c.ROCK_TILE_3:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_3")))
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_3"), code))
                 elif code == c.ROCK_TILE_4:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_4")))
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("rock_tile_4"), code))
                 elif code == c.FLOOR_TILE:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("floor_tile")))
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("floor_tile"), code))
+                elif code == c.WALL_TILE:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("wall_tile"), code))
+                elif code == c.BEAM_TILE:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("beam_tile"), code))
+                elif code == c.SPIKE_TILE:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("spike_tile"), code))
+                elif code == c.ROOM_TILE_1:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("room_tile"), code))
+                elif code == c.METALL:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("metall_left"), code))
+                elif code == c.BLADER:
+                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("blader_left"), code))
                    
         
 
@@ -136,6 +148,17 @@ class Game:
     def update(self):
         self.player.update(self.collision_tiles, self.player_moving_this_frame)
         self.player.bullets.update()
+
+        # Detect collisions (dokill1=True kills the bullet, dokill2=False keeps the tile)
+        hits = pygame.sprite.groupcollide(self.player.bullets, self.collision_tiles, True, False)
+
+        # loop through the hits to decide which tiles to destroy 
+        for bullett, tiles_hit in hits.items():
+            for tile in tiles_hit:
+                if tile.code in [c.ROCK_TILE_1, c.ROCK_TILE_2, c.ROCK_TILE_3, c.ROCK_TILE_4]:
+                    tile.kill() 
+                elif tile.code == c.WALL_TILE or tile.code == c.FLOOR_TILE:
+                    logger.debug("Bullet hit an indestructable wall.")
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)

@@ -23,12 +23,22 @@
         "player_shoot_left":  {"path": "assets/images/megaman-left-shoot.png",  "scale": [62, 48]},
         "player_shoot_right": {"path": "assets/images/megaman-right-shoot.png", "scale": [62, 48]},
 
+        "metall_left":        {"path": "assets/images/metall-left.png",        "scale": [36, 30]},
+        "metall_right":       {"path": "assets/images/metall-right.png",       "scale": [36, 30]},
+        "metall_guard_left":  {"path": "assets/images/metall-left-guard.png",  "scale": [36, 30]},
+        "metall_guard_right": {"path": "assets/images/metall-right-guard.png", "scale": [36, 30]},
+
+        "blader_left":        {"path": "assets/images/blader-left.png",        "scale": [32, 40]},
+        "blader_right":       {"path": "assets/images/blader-right.png",       "scale": [32, 40]},
+        "blader_guard_left":  {"path": "assets/images/blader-left-guard.png",  "scale": [32, 40]},
+        "blader_guard_right": {"path": "assets/images/blader-right-guard.png", "scale": [32, 40]},
+
         "bullet": {"path": "assets/images/bullet.png", "scale": [16, 12]},
         
 
         "beam_tile":    {"path": "assets/images/beam-tile.png", "scale": [32, 32]},
         "door_tile":    {"path": "assets/images/door-tile.png", "scale": [32, 32]},
-        "floor_tile":   {"path": "assets/images/floor-tile.png", "scale" : [32, 32]},
+        "floor_tile":   {"path": "assets/images/floor-tile.png","scale": [32, 32]},
         "wall_tile" :   {"path": "assets/images/wall-tile.png", "scale": [32, 32]}, 
 
         "rock_tile_1" : {"path": "assets/images/rock-tile1.png", "scale" : [32, 32]},
