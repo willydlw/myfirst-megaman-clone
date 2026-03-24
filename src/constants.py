@@ -36,4 +36,22 @@ TILE_SIZE = 32
 BACKGROUND_COLOR = (255,255,255) #(25, 52, 230)
 
 
+# jumping 
+MIN_JUMP_HEIGHT = 4
+
 COYOTE_DURATION = 150   # milliseconds of grace period
+
+
+# mapping symbols 
+SKY          = 0
+ROCK_TILE_1  = 1
+ROCK_TILE_2  = 2
+ROCK_TILE_3  = 3
+ROCK_TILE_4  = 4
+FLOOR_TILE   = 5
+
+
+
+NON_COLLISION_TILE_THRESHOLD = 5
+
+

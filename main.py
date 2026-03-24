@@ -48,7 +48,7 @@ def main():
 
     # 5. Start the game
     try:
-        game = Game() 
+        game = Game(1) 
         game.run()
     finally:
         # This blocks runs no matter what (even if the game crashes)

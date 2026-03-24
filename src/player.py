@@ -3,6 +3,7 @@ from pygame.math import Vector2
 
 from .assetManager import AssetManager
 from . import constants as c
+from .bullet import Bullet
 
 import logging 
 
@@ -38,17 +39,17 @@ class Player(pygame.sprite.Sprite):
 
         # Walking Animation Frame Lists
         self.walk_left_frames = [
-            AssetManager.get_image("player-left-walk-0"),
-            AssetManager.get_image("player-left-walk-1"),
-            AssetManager.get_image("player-left-walk-2"),
-            AssetManager.get_image("player-left-walk-3"),
+            AssetManager.get_image("player_left_walk_0"),
+            AssetManager.get_image("player_left_walk_1"),
+            AssetManager.get_image("player_left_walk_2"),
+            AssetManager.get_image("player_left_walk_3"),
         ]
 
         self.walk_right_frames = [
-            AssetManager.get_image("player-right-walk-0"),
-            AssetManager.get_image("player-right-walk-1"),
-            AssetManager.get_image("player-right-walk-2"),
-            AssetManager.get_image("player-right-walk-3"),
+            AssetManager.get_image("player_right_walk_0"),
+            AssetManager.get_image("player_right_walk_1"),
+            AssetManager.get_image("player_right_walk_2"),
+            AssetManager.get_image("player_right_walk_3"),
         ]
 
         # Animation State 
@@ -63,7 +64,11 @@ class Player(pygame.sprite.Sprite):
             "jump_right": [AssetManager.get_image("player_jump_right")],
             "jump_left":  [AssetManager.get_image("player_jump_left")],
             "walk_right": self.walk_right_frames,
-            "walk_left":  self.walk_left_frames
+            "walk_left":  self.walk_left_frames,
+            "shoot_right": [AssetManager.get_image("player_shoot_right")],
+            "shoot_left": [AssetManager.get_image("player_shoot_left")],
+            "jump_shoot_right": [AssetManager.get_image("player_jump_shoot_right")],
+            "jump_shoot_left": [AssetManager.get_image("player_jump_shoot_left")]
         }
 
         # Set initial state 
@@ -78,6 +83,12 @@ class Player(pygame.sprite.Sprite):
         # self.rect is for Drawing (matches the current image size)
         self.rect = self.image.get_rect(midbottom=self.hitbox.midbottom)
 
+        # shooting state 
+        self.is_shooting = False 
+        self.shoot_timer = 0 
+        self.shoot_duration = 300 # ms to show the shooting frame 
+        self.bullets = pygame.sprite.Group()
+
         logger.info("Player initialized")      
 
 
@@ -90,19 +101,27 @@ class Player(pygame.sprite.Sprite):
         # draw the visual rect in blue to see the image boundary 
         pygame.draw.rect(surface, (0, 0, 255), self.rect, 1)
 
+
     def animate(self, moving_this_frame):
         now = pygame.time.get_ticks() 
 
+        # reset shooting state after duration 
+        if self.is_shooting and now - self.shoot_timer > self.shoot_duration:
+            self.is_shooting = False 
+
+        # build the state string dynamically 
+        shoot_part = "shoot_" if self.is_shooting else ""
+
         # 1. Determine the state 
         if self.jumping:
-            state = "jump_" + self.direction 
+            state = f"jump_{shoot_part}{self.direction}" 
         elif moving_this_frame and abs(self.velocity.x) > c.MIN_SPEED:
-            state = "walk_" + self.direction 
+            state = f"{shoot_part if self.is_shooting else "walk_"}{self.direction}"
         else:
-            state = "idle_" + self.direction 
+            state = f"{shoot_part if self.is_shooting else "idle_"}{self.direction}"
 
         # 2. Get the current frame list 
-        current_frames = self.animations.get(state, self.animations["idle_right"])
+        current_frames = self.animations.get(state, self.animations[f"idle_{self.direction}"])
 
         # 3. Cycle frames base on timer 
         if now - self.last_update > self.animation_speed:
@@ -113,7 +132,9 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.frame_index = (self.frame_index + 1) % len(current_frames)
             
-            self.image = current_frames[self.frame_index]
+            self.image = current_frames[self.frame_index] 
+
+        self.rect = self.image.get_rect(midbottom=self.hitbox.midbottom)
 
 
     def jump(self):
@@ -133,6 +154,20 @@ class Player(pygame.sprite.Sprite):
         self.jump_buffer_time = 0 # Clear buffer so we don't double jump
         logger.info("Jump executed")
 
+    def stop_jump(self):
+        """Called when jump key is released to allow variable jump height"""
+        # if moving upwards, reduce the upward velocity significantly 
+        if self.velocity.y < -c.MIN_JUMP_HEIGHT:
+            self.velocity.y = -c.MIN_JUMP_HEIGHT 
+
+    def shoot(self):
+        self.is_shooting = True 
+        self.shoot_timer = pygame.time.get_ticks() 
+
+        # adjust bullet spawn point so it comes out of the arm 
+        spawn_x = self.rect.right if self.direction == "right" else self.rect.left
+        new_bullet = Bullet(spawn_x, self.rect.centery, self.direction)
+        self.bullets.add(new_bullet)
 
 
     def update(self, tiles, moving):
@@ -181,9 +216,10 @@ class Player(pygame.sprite.Sprite):
              if self.hitbox.colliderect(tile.rect):
                 if self.velocity.y > 0:                   # moving down, hit floor 
                     self.hitbox.bottom = tile.rect.top 
+                    self.velocity.y = 0
                     self.jumping = False 
                     # update last time on solid ground
-                    self.last_grounded_time = now
+                    self.last_grounded_time = now 
 
                     # JUMP BUFFER CHECK: 
                     # If the player pressed jump recently, jump now!
@@ -193,7 +229,8 @@ class Player(pygame.sprite.Sprite):
                 elif self.velocity.y < 0:                   # moving up, hit ceiling 
                     #logging.debug(f"collided with tile BOTTOM")
                     self.hitbox.top = tile.rect.bottom 
-                self.velocity.y = 0
+                    self.velocity.y = 0
+
                 self.position.y = self.hitbox.y
                 break # stop checking tiles once we collide
                 

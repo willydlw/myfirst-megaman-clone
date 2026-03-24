@@ -2,19 +2,40 @@
     "images": {
         "player_left":  { "path": "assets/images/megaman-left.png",  "scale": [42, 48]},
         "player_right": { "path": "assets/images/megaman-right.png", "scale": [42, 48]},
-        "player-left-walk-0": {"path": "assets/images/megaman-left-walk0.png", "scale": [48, 48]},
-        "player-left-walk-1": {"path": "assets/images/megaman-left-walk1.png", "scale": [48, 48]},
-        "player-left-walk-2": {"path": "assets/images/megaman-left-walk2.png", "scale": [48, 48]},
-        "player-left-walk-3": {"path": "assets/images/megaman-left-walk3.png", "scale": [48, 48]},
 
-        "player-right-walk-0": {"path": "assets/images/megaman-right-walk0.png", "scale": [48, 48]},
-        "player-right-walk-1": {"path": "assets/images/megaman-right-walk1.png", "scale": [48, 48]},
-        "player-right-walk-2": {"path": "assets/images/megaman-right-walk2.png", "scale": [48, 48]},
-        "player-right-walk-3": {"path": "assets/images/megaman-left-walk3.png", "scale": [48, 48]},
 
-        "player_jump_left": {"path": "assets/images/megaman-left-jump.png", "scale": [52, 60]},
+        "player_left_walk_0": {"path": "assets/images/megaman-left-walk0.png", "scale": [48, 48]},
+        "player_left_walk_1": {"path": "assets/images/megaman-left-walk1.png", "scale": [48, 48]},
+        "player_left_walk_2": {"path": "assets/images/megaman-left-walk2.png", "scale": [48, 48]},
+        "player_left_walk_3": {"path": "assets/images/megaman-left-walk3.png", "scale": [48, 48]},
+
+        "player_right_walk_0": {"path": "assets/images/megaman-right-walk0.png", "scale": [48, 48]},
+        "player_right_walk_1": {"path": "assets/images/megaman-right-walk1.png", "scale": [48, 48]},
+        "player_right_walk_2": {"path": "assets/images/megaman-right-walk2.png", "scale": [48, 48]},
+        "player_right_walk_3": {"path": "assets/images/megaman-right-walk3.png", "scale": [48, 48]},
+
+        "player_jump_left":  {"path": "assets/images/megaman-left-jump.png", "scale": [52, 60]},
         "player_jump_right": {"path": "assets/images/megaman-right-jump.png", "scale": [52, 60]},
-        "floor_tile": {"path": "assets/images/floor-tile.png", "scale" : [32, 32]},
+
+        "player_jump_shoot_left":  {"path": "assets/images/megaman-left-jump-shoot.png", "scale": [58, 60]},
+        "player_jump_shoot_right": {"path": "assets/images/megaman-right-jump-shoot.png", "scale": [58, 60]},
+
+        "player_shoot_left":  {"path": "assets/images/megaman-left-shoot.png",  "scale": [62, 48]},
+        "player_shoot_right": {"path": "assets/images/megaman-right-shoot.png", "scale": [62, 48]},
+
+        "bullet": {"path": "assets/images/bullet.png", "scale": [16, 12]},
+        
+
+        "beam_tile":    {"path": "assets/images/beam-tile.png", "scale": [32, 32]},
+        "door_tile":    {"path": "assets/images/door-tile.png", "scale": [32, 32]},
+        "floor_tile":   {"path": "assets/images/floor-tile.png", "scale" : [32, 32]},
+        "wall_tile" :   {"path": "assets/images/wall-tile.png", "scale": [32, 32]}, 
+
+        "rock_tile_1" : {"path": "assets/images/rock-tile1.png", "scale" : [32, 32]},
+        "rock_tile_2" : {"path": "assets/images/rock-tile2.png", "scale" : [32, 32]},
+        "rock_tile_3" : {"path": "assets/images/rock-tile3.png", "scale" : [32, 32]},
+        "rock_tile_4" : {"path": "assets/images/rock-tile4.png", "scale" : [32, 32]},
+        
         "background" : "assets/images/background.png"
     },
     "fonts": {
