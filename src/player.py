@@ -23,6 +23,19 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False 
         self.direction = "right"
 
+        # To add Coyote Time, you need a timer that tracks how long it has been since 
+        # the player was last touching the ground. If the player walks off a ledge, 
+        # they get a small window (usually 100–200ms) where they can still trigger a jump.
+        self.last_grounded_time = 0
+        self.coyote_duration = c.COYOTE_DURATION  # milliseconds of grace period
+
+        # Jump buffering: remember" a jump press that happened slightly before the 
+        # player touched the ground. If they land within a small window (usually 100–150ms) 
+        # after pressing the button, the jump triggers automatically.
+        self.jump_buffer_time = 0
+        self.jump_buffer_duration = 150  # ms to "remember" the jump press
+
+
         # Walking Animation Frame Lists
         self.walk_left_frames = [
             AssetManager.get_image("player-left-walk-0"),
@@ -104,10 +117,22 @@ class Player(pygame.sprite.Sprite):
 
 
     def jump(self):
-        # only allow a jump if the player is not already jumping 
-        if not self.jumping:
-            self.velocity.y = -c.JUMP_STRENGTH 
-            self.jumping = True 
+        # Record the time the player TRIED to jump
+        self.jump_buffer_time = pygame.time.get_ticks()
+        
+        # Check if we can jump immediately (normal jump or coyote time)
+        now = pygame.time.get_ticks()
+        if not self.jumping or (now - self.last_grounded_time < self.coyote_duration):
+            self.perform_jump()
+
+    def perform_jump(self):
+        """The actual physics of jumping."""
+        self.velocity.y = -c.JUMP_STRENGTH 
+        self.jumping = True 
+        self.last_grounded_time = 0 
+        self.jump_buffer_time = 0 # Clear buffer so we don't double jump
+        logger.info("Jump executed")
+
 
 
     def update(self, tiles, moving):
@@ -150,11 +175,21 @@ class Player(pygame.sprite.Sprite):
         # 5. Y-Axis Movement and Collision
         self.position.y += self.velocity.y
         self.hitbox.y = round(self.position.y)
+
+        now = pygame.time.get_ticks()
         for tile in tiles:
              if self.hitbox.colliderect(tile.rect):
                 if self.velocity.y > 0:                   # moving down, hit floor 
                     self.hitbox.bottom = tile.rect.top 
-                    self.jumping = False
+                    self.jumping = False 
+                    # update last time on solid ground
+                    self.last_grounded_time = now
+
+                    # JUMP BUFFER CHECK: 
+                    # If the player pressed jump recently, jump now!
+                    if now - self.jump_buffer_time < self.jump_buffer_duration:
+                        self.perform_jump()
+
                 elif self.velocity.y < 0:                   # moving up, hit ceiling 
                     #logging.debug(f"collided with tile BOTTOM")
                     self.hitbox.top = tile.rect.bottom 

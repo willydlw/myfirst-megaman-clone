@@ -34,3 +34,6 @@ TILE_SIZE = 32
 
 # colors
 BACKGROUND_COLOR = (255,255,255) #(25, 52, 230)
+
+
+COYOTE_DURATION = 150   # milliseconds of grace period
