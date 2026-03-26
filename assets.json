@@ -28,6 +28,8 @@
         "metall_guard_left":  {"path": "assets/images/metall-left-guard.png",  "scale": [36, 30]},
         "metall_guard_right": {"path": "assets/images/metall-right-guard.png", "scale": [36, 30]},
 
+        "metall_bullet":      {"path": "assets/images/metall-bullet.png",      "scale": [12, 12]},
+
         "blader_left":        {"path": "assets/images/blader-left.png",        "scale": [32, 40]},
         "blader_right":       {"path": "assets/images/blader-right.png",       "scale": [32, 40]},
     

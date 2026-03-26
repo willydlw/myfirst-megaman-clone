@@ -34,6 +34,7 @@ class Game:
         self.non_collision_tiles = pygame.sprite.Group()
 
         self.metalls = pygame.sprite.Group()
+        self.metall_bullets = pygame.sprite.Group()
 
         # 3. Load asset and then create the mape
         AssetManager.load_all(c.ASSETS_CONFIG_PATH)
@@ -153,7 +154,19 @@ class Game:
         self.player.bullets.update()
 
         for metall in self.metalls:
-            metall.update(self.collision_tiles, self.player.position)
+            metall.update(self.collision_tiles, self.player.position, self.metall_bullets)
+
+        self.metall_bullets.update()
+
+        # --- METALL BULLET vs PLAYER --- 
+        if not self.player.is_invincible:
+            # check if enemy bullet hit the player's hitbox 
+            if pygame.sprite.spritecollide(self.player, self.metall_bullets, True, collided=hitbox_collide):
+                self.player.take_damage()
+
+        # --- METALL BULLET vs TILES --- 
+        # Optional: Bullets disappear when hitting walls 
+        pygame.sprite.groupcollide(self.metall_bullets, self.collision_tiles, True, False)
 
         # Bullet versus Metall Collision 
         # Returns a dict: {bullet: [metals_hit]}
@@ -207,7 +220,7 @@ class Game:
 
         # Falling Metall collision with floor tile?
         for metall in self.metalls:
-            metall.update(self.collision_tiles, self.player.position)
+            metall.update(self.collision_tiles, self.player.position, self.metall_bullets)
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
@@ -218,6 +231,7 @@ class Game:
 
         # draw enemies 
         self.metalls.draw(self.screen)
+        self.metall_bullets.draw(self.screen)
 
         draw_player = True 
         if self.player.is_invincible:

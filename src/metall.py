@@ -4,7 +4,9 @@ import pygame
 from pygame.math import Vector2 
 
 from .assetManager import AssetManager
-from .constants import METALL_HITBOX_HEIGHT, METALL_HITBOX_WIDTH, GRAVITY, METALL_DETECTION_RANGE
+from . import constants as c
+from .metallBullet import MetallBullet
+
 
 
 # create a logger named "player" (the filename)
@@ -20,7 +22,7 @@ class Metall(pygame.sprite.Sprite):
         self.state = "GUARD"
         self.guarding = True 
         self.state_timer = pygame.time.get_ticks() 
-        self.detection_range = METALL_DETECTION_RANGE 
+        self.detection_range = c.METALL_DETECTION_RANGE 
 
         # Movement variables 
         self.position = Vector2(x,y)
@@ -44,7 +46,7 @@ class Metall(pygame.sprite.Sprite):
         current_state = f"metall_{self.direction}"
 
         # self.hitbox is for Collisions
-        self.hitbox = pygame.Rect(x, y, METALL_HITBOX_WIDTH, METALL_HITBOX_HEIGHT)
+        self.hitbox = pygame.Rect(x, y, c.METALL_HITBOX_WIDTH, c.METALL_HITBOX_HEIGHT)
 
         # Set self.image and self.rect based on current state
         self.image = self.animations[current_state][0]
@@ -55,9 +57,9 @@ class Metall(pygame.sprite.Sprite):
         logger.info("Metall initialized")     
 
     
-    def update(self, collision_tiles, player_pos):
+    def update(self, collision_tiles, player_pos, bullet_group):
         # apply gravity
-        self.velocity.y += GRAVITY
+        self.velocity.y += c.GRAVITY
         self.position.y += self.velocity.y
         self.hitbox.y = round(self.position.y)
 
@@ -80,7 +82,7 @@ class Metall(pygame.sprite.Sprite):
             self.guarding = False 
             if current_time - self.state_timer > 500: # half second to pop up
                 self.state = "SHOOT"
-                self.shoot() 
+                self.shoot(bullet_group) 
                 self.state_timer = current_time 
         elif self.state == "SHOOT":
             # wait a momemnt after shooting before hiding
@@ -115,8 +117,23 @@ class Metall(pygame.sprite.Sprite):
         self.image = self.animations[state_key][0]
 
 
-    def shoot(self):
-        logger.warning("NOT IMPLEMENTED")
+    def shoot(self, bullet_group):
+        # Determine horizontal base direction 
+        dir_mulitiplier = -1 if self.direction == "left" else 1 
+
+        # Spawn 3 bullets: Diagonally up, straight, diagonally down 
+        # Velocities: (x, -y), (x, 0), (x, y)
+        bullet_data = [
+            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, -c.METALL_BULLET_VELOCITY_Y),
+            (c.METALL_BULLET_VELOCITY_X, 0),
+            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, c.METALL_BULLET_VELOCITY_Y)
+        ]
+
+        for vx, vy in bullet_data:
+            bullet = MetallBullet(self.rect.centerx, self.rect.centery, vx, vy)
+            bullet_group.add(bullet)
+
+        logger.debug(f"Metall fired a 3-way spread {self.direction}")
 
 
     def __repr__(self):
