@@ -125,7 +125,7 @@ class Metall(pygame.sprite.Sprite):
         # Velocities: (x, -y), (x, 0), (x, y)
         bullet_data = [
             (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, -c.METALL_BULLET_VELOCITY_Y),
-            (c.METALL_BULLET_VELOCITY_X, 0),
+            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, 0),
             (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, c.METALL_BULLET_VELOCITY_Y)
         ]
 
