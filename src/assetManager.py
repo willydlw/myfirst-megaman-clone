@@ -49,7 +49,7 @@ class AssetManager:
 
             # scale only once, when loading 
             if scale:
-                logger.info(f"scaling image {name}, scale: {scale[0]}, {scale[1]}")
+                #logger.info(f"scaling image {name}, scale: {scale[0]}, {scale[1]}")
                 img = pygame.transform.scale(img, (scale[0], scale[1]))
 
             cls._images[name] = img 

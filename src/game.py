@@ -5,6 +5,7 @@ import logging
 from . import constants as c
 
 from .assetManager import AssetManager
+from .metall import Metall
 from .player import Player 
 from .tile import Tile 
 from .tile_map import GAME_MAP_1
@@ -31,6 +32,8 @@ class Game:
         # Create groups for collision and non-collision tiles 
         self.collision_tiles = pygame.sprite.Group()
         self.non_collision_tiles = pygame.sprite.Group()
+
+        self.metalls = pygame.sprite.Group()
 
         # 3. Load asset and then create the mape
         AssetManager.load_all(c.ASSETS_CONFIG_PATH)
@@ -78,10 +81,10 @@ class Game:
                     self.add_tiles(code, Tile(x, y, AssetManager.get_image("beam_tile"), code))
                 elif code == c.SPIKE_TILE:
                     self.add_tiles(code, Tile(x, y, AssetManager.get_image("spike_tile"), code))
-                elif code == c.ROOM_TILE_1:
+                elif code == c.ROOM_TILE:
                     self.add_tiles(code, Tile(x, y, AssetManager.get_image("room_tile"), code))
                 elif code == c.METALL:
-                    self.add_tiles(code, Tile(x, y, AssetManager.get_image("metall_left"), code))
+                    self.metalls.add(Metall(x, y))
                 elif code == c.BLADER:
                     self.add_tiles(code, Tile(x, y, AssetManager.get_image("blader_left"), code))
                    
@@ -160,12 +163,18 @@ class Game:
                 elif tile.code == c.WALL_TILE or tile.code == c.FLOOR_TILE:
                     logger.debug("Bullet hit an indestructable wall.")
 
+        for metall in self.metalls:
+            metall.update(self.collision_tiles)
+
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
 
         # draw the level tiles
         self.non_collision_tiles.draw(self.screen)
         self.collision_tiles.draw(self.screen)
+
+        # draw enemies 
+        self.metalls.draw(self.screen)
 
         # draw megaman image
         self.screen.blit(self.player.image, self.player.rect)

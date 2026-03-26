@@ -25,8 +25,8 @@ MIN_SPEED = 0.1        # Threshold to stop "creeping"
 
 
 # enemy variables 
-METALL_WIDTH = 36
-METALL_HEIGHT = 30 
+METALL_HITBOX_WIDTH = 36
+METALL_HITBOX_HEIGHT = 30 
 
 
 # tiles
