@@ -28,6 +28,8 @@ MIN_SPEED = 0.1        # Threshold to stop "creeping"
 METALL_HITBOX_WIDTH = 36
 METALL_HITBOX_HEIGHT = 30 
 
+METALL_DETECTION_RANGE = 250  # Distance to wake up the Metall
+
 
 # tiles
 TILE_SIZE = 32 

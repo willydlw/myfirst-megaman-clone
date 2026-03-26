@@ -5,6 +5,7 @@ class Tile(pygame.sprite.Sprite):
         super().__init__() 
         self.image = image 
         self.rect = self.image.get_rect(topleft=(x,y))
+        self.hitbox = self.rect 
         self.code = code
 
     def __repr__(self):

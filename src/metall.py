@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2 
 
 from .assetManager import AssetManager
-from .constants import METALL_HITBOX_HEIGHT, METALL_HITBOX_WIDTH, GRAVITY
+from .constants import METALL_HITBOX_HEIGHT, METALL_HITBOX_WIDTH, GRAVITY, METALL_DETECTION_RANGE
 
 
 # create a logger named "player" (the filename)
@@ -16,10 +16,15 @@ class Metall(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
 
+        # States: GUARD, POP_UP, SHOOT, HIDE
+        self.state = "GUARD"
+        self.guarding = True 
+        self.state_timer = pygame.time.get_ticks() 
+        self.detection_range = METALL_DETECTION_RANGE 
+
         # Movement variables 
         self.position = Vector2(x,y)
         self.velocity = Vector2(0, 0)   # Can drop down from sky, no horizontal movement
-        self.guarding = False 
         self.direction = "left"
 
          # Animation State 
@@ -50,15 +55,48 @@ class Metall(pygame.sprite.Sprite):
         logger.info("Metall initialized")     
 
     
-    def update(self, tiles):
-        # apply gravity 
+    def update(self, collision_tiles, player_pos):
+        # apply gravity
         self.velocity.y += GRAVITY
-
-        # Y-Axis Movement and Collision
         self.position.y += self.velocity.y
         self.hitbox.y = round(self.position.y)
 
-        for tile in tiles:
+        current_time = pygame.time.get_ticks()
+        dist = self.position.distance_to(player_pos)  # distance to player
+
+        if self.state == "GUARD":
+            self.guarding = True 
+            # Face the player
+            if player_pos.x < self.position.x:
+                self.direction = "left"
+            else:
+                self.direction = "right"
+
+            if dist < self.detection_range:
+                self.state = "POP_UP"
+                self.state_timer = current_time 
+
+        elif self.state == "POP_UP":
+            self.guarding = False 
+            if current_time - self.state_timer > 500: # half second to pop up
+                self.state = "SHOOT"
+                self.shoot() 
+                self.state_timer = current_time 
+        elif self.state == "SHOOT":
+            # wait a momemnt after shooting before hiding
+            if current_time - self.state_timer > 300:
+                self.state = "HIDE"
+                self.state_timer = current_time
+
+        elif self.state == "HIDE":
+            self.guarding = True   # start hiding during the animation
+            if current_time - self.state_timer > 500:
+                self.state = "GUARD"
+
+        self.update_animation() 
+
+        # Collision 
+        for tile in collision_tiles:
              if self.hitbox.colliderect(tile.rect):
                 if self.velocity.y > 0:                   # moving down, hit floor 
                     self.hitbox.bottom = tile.rect.top 
@@ -68,6 +106,17 @@ class Metall(pygame.sprite.Sprite):
 
         # Sync image rect to hitbox 
         self.rect.midbottom = self.hitbox.midbottom 
+
+    
+    def update_animation(self):
+        # swap images based on state and direction 
+        suffix = "guard" if self.guarding else ""
+        state_key = f'metall_{suffix}_{self.direction}'.replace("__", "_")
+        self.image = self.animations[state_key][0]
+
+
+    def shoot(self):
+        logger.warning("NOT IMPLEMENTED")
 
 
     def __repr__(self):

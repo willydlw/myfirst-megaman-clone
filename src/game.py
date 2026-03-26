@@ -152,19 +152,62 @@ class Game:
         self.player.update(self.collision_tiles, self.player_moving_this_frame)
         self.player.bullets.update()
 
+        for metall in self.metalls:
+            metall.update(self.collision_tiles, self.player.position)
+
+        # Bullet versus Metall Collision 
+        # Returns a dict: {bullet: [metals_hit]}
+        # dokill1 = True (bullet disappears), dokill2=False (metall stays, for now)
+        enemy_hits = pygame.sprite.groupcollide(
+            self.player.bullets, 
+            self.metalls, 
+            True, 
+            False,
+            collided=hitbox_collide         # use hitbox for collisions instead of rects
+        )
+
+        for bullet, metalls in enemy_hits.items():
+            for metall in metalls:
+                # if metall is not guarding, it takes damage/dies
+                if not metall.guarding:
+                    metall.kill()
+                else:
+                    logger.debug("Bullet pinge off Metall's helmet!")
+                    logger.debug("Optional: spawn a spark particle here")
+
+        # Player versus Metall Collision 
+        
+        self.player.handle_invincibility()  # update the timer 
+        if not self.player.is_invincible:
+            # player is not in a group, so we use spritecollide 
+            if pygame.sprite.spritecollide(self.player, self.metalls, False, collided=hitbox_collide):
+                logger.info("Player touched a Mettal! Take damage.")
+                self.player.take_damage()
+
+
+        # Bullet versus Environment Tiles
+
         # Detect collisions (dokill1=True kills the bullet, dokill2=False keeps the tile)
-        hits = pygame.sprite.groupcollide(self.player.bullets, self.collision_tiles, True, False)
+        hits = pygame.sprite.groupcollide(
+            self.player.bullets, 
+            self.collision_tiles, 
+            True, 
+            False, 
+            collided=hitbox_collide
+        )
 
         # loop through the hits to decide which tiles to destroy 
         for bullett, tiles_hit in hits.items():
             for tile in tiles_hit:
                 if tile.code in [c.ROCK_TILE_1, c.ROCK_TILE_2, c.ROCK_TILE_3, c.ROCK_TILE_4]:
+                    logger.info("Bullet struck rock tile. Killing roce tile")
                     tile.kill() 
                 elif tile.code == c.WALL_TILE or tile.code == c.FLOOR_TILE:
                     logger.debug("Bullet hit an indestructable wall.")
 
+        # Falling Metall collision with floor tile?
         for metall in self.metalls:
-            metall.update(self.collision_tiles)
+            metall.update(self.collision_tiles, self.player.position)
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
@@ -176,11 +219,22 @@ class Game:
         # draw enemies 
         self.metalls.draw(self.screen)
 
-        # draw megaman image
-        self.screen.blit(self.player.image, self.player.rect)
+        draw_player = True 
+        if self.player.is_invincible:
+            # Flicker every 100 ms 
+            if (pygame.time.get_ticks() // 100) % 2 == 0:
+                draw_player = False 
 
-        # draw debug boxes (optional, for troubleshooting)
-        self.player.draw_debug(self.screen)
+        if draw_player:
+            self.screen.blit(self.player.image, self.player.rect)
+            # draw debug boxes (optional, for troubleshooting)
+            self.player.draw_debug(self.screen)
+
         self.player.bullets.draw(self.screen) 
         pygame.display.flip()
 
+
+
+def hitbox_collide(sprite_a, sprite_b):
+    """Callbackk to chec collision using the .hitbox attribute."""
+    return sprite_a.hitbox.colliderect(sprite_b.hitbox)

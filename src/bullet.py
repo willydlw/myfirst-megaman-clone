@@ -11,6 +11,7 @@ class Bullet(pygame.sprite.Sprite):
         # Use pygame surface (no image for bullet)
         self.image = AssetManager.get_image("bullet")
         self.rect = self.image.get_rect(center=(x,y))
+        self.hitbox = self.rect.copy()
         self.speed = 10
         self.direction = direction 
 

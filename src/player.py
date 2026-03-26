@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         # Movement variables 
         self.position = Vector2(x,y)
         self.velocity = Vector2(0, 0)
-        self.jumping = False 
+        self.jumping = False
         self.direction = "right"
 
         # To add Coyote Time, you need a timer that tracks how long it has been since 
@@ -56,6 +56,11 @@ class Player(pygame.sprite.Sprite):
         self.frame_index = 0 
         self.animation_speed = 100      # ms between frames 
         self.last_update = pygame.time.get_ticks()
+
+        # Invincibility State 
+        self.is_invincible = False 
+        self.invincibility_duration = 1500     # milliseconds 
+        self.last_hit_time = 0 
 
         # Group animations for easy access 
         self.animations = {
@@ -169,6 +174,18 @@ class Player(pygame.sprite.Sprite):
         new_bullet = Bullet(spawn_x, self.rect.centery, self.direction)
         self.bullets.add(new_bullet)
 
+    def handle_invincibility(self):
+        if self.is_invincible:
+            current_time = pygame.time.get_ticks() 
+            if current_time - self.last_hit_time > self.invincibility_duration:
+                self.is_invincible = False 
+
+    def take_damage(self):
+        if not self.is_invincible:
+            self.is_invincible = True 
+            self.last_hit_time = pygame.time.get_ticks() 
+            logger.info("Player hit! Invincibility started")
+            logger.info("TODO: add health reduction here")
 
     def update(self, tiles, moving):
         # apply gravity 
