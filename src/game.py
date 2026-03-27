@@ -165,6 +165,8 @@ class Game:
 
         self.metall_bullets.update()
         self.particles.update()
+        self.reward_items.update(self.collision_tiles)
+        self.__check_player_item_collection() 
 
         # Handle Collisions
         self.__check_metall_bullet_player_collision()
@@ -255,12 +257,30 @@ class Game:
                     logger.debug("Bullet hit an indestructable wall.")
 
 
-    def drop_reward_item(self, character):
+    def __check_player_item_collection(self):
+        # detect if player touches an item
+        collected_items = pygame.sprite.spritecollide(
+            self.player, 
+            self.reward_items, 
+            True, 
+            collided=hitbox_collide
+        )
+
+        for item in collected_items:
+            logger.info(f"Player collected {item.name}")
+            # Add logic here to restore player health/energy
+            if item == "life_energy":
+                self.player.add_energy(20) 
+            elif item == "big_life_energy":
+                self.player.add_energy(50)
+
+
+    def drop_reward_item(self, enemy):
         random_number = random.randint(1, 100) # inclusive of 100 
         if 0 < random_number <= 20:
-            self.reward_items.add(RewardItem(character.position.x, character.position.y, "big_life_energy"))
+            self.reward_items.add(RewardItem(enemy.position.x, enemy.position.y, "big_life_energy"))
         elif 20 < random_number <= 50:
-            self.reward_items.add(RewardItem(character.position.x, character.position.y, "life_energy"))
+            self.reward_items.add(RewardItem(enemy.position.x, enemy.position.y, "life_energy"))
         
 
     def draw(self):
@@ -288,6 +308,13 @@ class Game:
         self.player.bullets.draw(self.screen) 
         self.particles.draw(self.screen)
         self.player.draw_health_bar(self.screen)
+
+        # pygame.sprite.Group.draw() draws everythin automatically,
+        # so we must handle drawing only visible items here 
+        for item in self.reward_items:
+            if item.visible:
+                self.screen.blit(item.image, item.rect)
+                
         pygame.display.flip()
 
 

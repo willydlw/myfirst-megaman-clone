@@ -22,11 +22,17 @@ class Player(pygame.sprite.Sprite):
     MAX_SPEED = 5          # Speed cap
     MIN_SPEED = 0.1        # Threshold to stop "creeping"
 
-    MAX_HEALTH = 100
-    HEALTH_BAR_WIDTH = 200
-    HEALTH_BAR_HEIGHT = 15
-    HEALTH_RATIO = MAX_HEALTH / HEALTH_BAR_WIDTH
+    MAX_HEALTH = 28
 
+    # Health bar config
+    HB_X = 32 
+    HB_Y = 112           # bottom of bar (fills upward)
+    HB_WIDTH = 12       # width of segments
+    HB_TICK_HEIGHT = 2  # height of each color segment
+    HB_GAP = 1          # space between black segments
+    HB_MAX_UNITS = 28
+    
+    
     # jumping 
     MIN_JUMP_HEIGHT = 4
     JUMP_STRENGTH = 14     # How high the player launches (negative velocity)
@@ -214,21 +220,43 @@ class Player(pygame.sprite.Sprite):
             self.last_hit_time = pygame.time.get_ticks() 
             logger.info("Player hit! Health: {self.current_health}")
     
+    def add_energy(self, amount):
+        if amount < 0:
+            logger.debug(f"negative energy amount: {amount}")
+        else:
+            self.health += amount 
+            if self.health > self.MAX_HEALTH:
+                self.health = self.MAX_HEALTH
 
     def draw_health_bar(self, surface):
-        # health bar position (top left)
-        pos = 20, 20 
-        dimensions = self.HEALTH_BAR_WIDTH, self.HEALTH_BAR_HEIGHT
+        full_height = self.HB_MAX_UNITS * (self.HB_TICK_HEIGHT + self.HB_GAP)
+        background_rect = pygame.Rect(self.HB_X - 2, self.HB_Y - full_height, self.HB_WIDTH + 4, full_height + 4)
+        pygame.draw.rect(surface, (0,0,0), background_rect)
 
-        # draw background 
-        pygame.draw.rect(surface, (0, 0, 0), (*pos, *dimensions))
+        for i in range(self.HB_MAX_UNITS):
+            # calc y position (moving up from the base Y)
+            y_pos = self.HB_Y - (i * (self.HB_TICK_HEIGHT + self.HB_GAP))
 
-        # draw foreground 
-        health_width = self.current_health / self.HEALTH_RATIO
-        pygame.draw.rect(surface, (0, 255, 0), (*pos, health_width, self.HEALTH_BAR_HEIGHT))
+            # determing color: Yellow/white for health, Dark gray for empty 
+            if i < self.current_health:
+                color = (255, 220, 0)
+                inner_color = (255, 255, 255) # 1 pixel highlight on left for a 3D look
+            else:
+                color = (40, 40, 40)
+                inner_color = color 
 
-        # draw border 
-        pygame.draw.rect(surface, (255, 255, 255), (*pos, *dimensions), 2)
+            # draw the segment 
+            segment_rect = pygame.Rect(self.HB_X, y_pos, self.HB_WIDTH, self.HB_TICK_HEIGHT)
+            pygame.draw.rect(surface, color, segment_rect)
+
+            # add the shine highlight 
+            if i < self.current_health:
+                pygame.draw.line(
+                    surface, 
+                    inner_color, 
+                    (self.HB_X, y_pos), 
+                    (self.HB_X, y_pos + self.HB_TICK_HEIGHT - 1)
+                )
 
     def update(self, tiles, moving):
         # apply gravity 
