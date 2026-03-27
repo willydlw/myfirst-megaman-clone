@@ -63,9 +63,28 @@ class Metall(pygame.sprite.Sprite):
         self.position.y += self.velocity.y
         self.hitbox.y = round(self.position.y)
 
-        current_time = pygame.time.get_ticks()
-        dist = self.position.distance_to(player_pos)  # distance to player
+        self.__check_tile_collision(collision_tiles)        
+        self.__update_state(player_pos, bullet_group)
+        self.__update_animation() 
 
+        # Sync image rect to hitbox 
+        self.rect.midbottom = self.hitbox.midbottom 
+
+    
+    def __check_tile_collision(self, collision_tiles):
+        """Metalls dropping from sky stop when colliding with floor tiles"""
+        for tile in collision_tiles:
+             if self.hitbox.colliderect(tile.rect):
+                if self.velocity.y > 0:                   # moving down, hit floor 
+                    self.hitbox.bottom = tile.rect.top 
+                    self.velocity.y = 0
+                self.position.y = self.hitbox.y
+                break # stop checking tiles once we collide
+        
+
+    def __update_state(self, player_pos, bullet_group):
+        current_time = pygame.time.get_ticks()
+        
         if self.state == "GUARD":
             self.guarding = True 
             # Face the player
@@ -74,7 +93,8 @@ class Metall(pygame.sprite.Sprite):
             else:
                 self.direction = "right"
 
-            if dist < self.detection_range:
+            dist_to_player = self.position.distance_to(player_pos) 
+            if dist_to_player < self.detection_range:
                 self.state = "POP_UP"
                 self.state_timer = current_time 
 
@@ -82,8 +102,9 @@ class Metall(pygame.sprite.Sprite):
             self.guarding = False 
             if current_time - self.state_timer > 500: # half second to pop up
                 self.state = "SHOOT"
-                self.shoot(bullet_group) 
+                self.__shoot(bullet_group) 
                 self.state_timer = current_time 
+
         elif self.state == "SHOOT":
             # wait a momemnt after shooting before hiding
             if current_time - self.state_timer > 300:
@@ -95,29 +116,15 @@ class Metall(pygame.sprite.Sprite):
             if current_time - self.state_timer > 500:
                 self.state = "GUARD"
 
-        self.update_animation() 
-
-        # Collision 
-        for tile in collision_tiles:
-             if self.hitbox.colliderect(tile.rect):
-                if self.velocity.y > 0:                   # moving down, hit floor 
-                    self.hitbox.bottom = tile.rect.top 
-                    self.velocity.y = 0
-                self.position.y = self.hitbox.y
-                break # stop checking tiles once we collide
-
-        # Sync image rect to hitbox 
-        self.rect.midbottom = self.hitbox.midbottom 
-
     
-    def update_animation(self):
+    def __update_animation(self):
         # swap images based on state and direction 
         suffix = "guard" if self.guarding else ""
         state_key = f'metall_{suffix}_{self.direction}'.replace("__", "_")
         self.image = self.animations[state_key][0]
 
 
-    def shoot(self, bullet_group):
+    def __shoot(self, bullet_group):
         # Determine horizontal base direction 
         dir_mulitiplier = -1 if self.direction == "left" else 1 
 
