@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 class MetallBullet(pygame.sprite.Sprite):
+
+    BULLET_WIDTH = 12
+    BULLET_HEIGHT = BULLET_WIDTH 
+    BULLET_VELOCITY_X = 2 
+    BULLET_VELOCITY_Y = BULLET_VELOCITY_X 
+
     def __init__(self, x, y, vel_x, vel_y):
         super().__init__() 
         self.image = AssetManager.get_image("metall_bullet")

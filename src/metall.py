@@ -4,7 +4,7 @@ import pygame
 from pygame.math import Vector2 
 
 from .assetManager import AssetManager
-from . import constants as c
+from .constants import GRAVITY
 from .metallBullet import MetallBullet
 
 
@@ -15,6 +15,12 @@ from .metallBullet import MetallBullet
 logger = logging.getLogger(__name__)
 
 class Metall(pygame.sprite.Sprite):
+
+    HITBOX_WIDTH = 36
+    HITBOX_HEIGHT = 30 
+
+    DETECTION_RANGE = 250  # Distance to wake up the Metall
+
     def __init__(self, x, y):
         super().__init__()
 
@@ -22,7 +28,7 @@ class Metall(pygame.sprite.Sprite):
         self.state = "GUARD"
         self.guarding = True 
         self.state_timer = pygame.time.get_ticks() 
-        self.detection_range = c.METALL_DETECTION_RANGE 
+        self.detection_range = self.DETECTION_RANGE 
 
         # Movement variables 
         self.position = Vector2(x,y)
@@ -31,6 +37,9 @@ class Metall(pygame.sprite.Sprite):
 
          # Animation State 
         self.frame_index = 0 
+
+        # Health 
+        self.health = 1
 
       
         # Group animations for faster/easier access
@@ -46,7 +55,7 @@ class Metall(pygame.sprite.Sprite):
         current_state = f"metall_{self.direction}"
 
         # self.hitbox is for Collisions
-        self.hitbox = pygame.Rect(x, y, c.METALL_HITBOX_WIDTH, c.METALL_HITBOX_HEIGHT)
+        self.hitbox = pygame.Rect(x, y, self.HITBOX_WIDTH, self.HITBOX_HEIGHT)
 
         # Set self.image and self.rect based on current state
         self.image = self.animations[current_state][0]
@@ -59,7 +68,7 @@ class Metall(pygame.sprite.Sprite):
     
     def update(self, collision_tiles, player_pos, bullet_group):
         # apply gravity
-        self.velocity.y += c.GRAVITY
+        self.velocity.y += GRAVITY
         self.position.y += self.velocity.y
         self.hitbox.y = round(self.position.y)
 
@@ -131,9 +140,9 @@ class Metall(pygame.sprite.Sprite):
         # Spawn 3 bullets: Diagonally up, straight, diagonally down 
         # Velocities: (x, -y), (x, 0), (x, y)
         bullet_data = [
-            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, -c.METALL_BULLET_VELOCITY_Y),
-            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, 0),
-            (c.METALL_BULLET_VELOCITY_X * dir_mulitiplier, c.METALL_BULLET_VELOCITY_Y)
+            (MetallBullet.BULLET_VELOCITY_X * dir_mulitiplier, -MetallBullet.BULLET_VELOCITY_Y),
+            (MetallBullet.BULLET_VELOCITY_X * dir_mulitiplier, 0),
+            (MetallBullet.BULLET_VELOCITY_X * dir_mulitiplier, MetallBullet.BULLET_VELOCITY_Y)
         ]
 
         for vx, vy in bullet_data:

@@ -1,12 +1,15 @@
 import pygame 
 import sys 
 import logging 
+import random 
 
 from . import constants as c
 
 from .assetManager import AssetManager
+from .rewardItem import RewardItem
 from .metall import Metall
 from .player import Player 
+from .spark import Spark 
 from .tile import Tile 
 from .tile_map import GAME_MAP_1
 
@@ -35,6 +38,10 @@ class Game:
 
         self.metalls = pygame.sprite.Group()
         self.metall_bullets = pygame.sprite.Group()
+        
+        self.particles = pygame.sprite.Group()
+
+        self.reward_items = pygame.sprite.Group()
 
         # 3. Load asset and then create the mape
         AssetManager.load_all(c.ASSETS_CONFIG_PATH)
@@ -157,6 +164,7 @@ class Game:
             metall.update(self.collision_tiles, self.player.position, self.metall_bullets)
 
         self.metall_bullets.update()
+        self.particles.update()
 
         # Handle Collisions
         self.__check_metall_bullet_player_collision()
@@ -188,7 +196,7 @@ class Game:
         enemy_hits = pygame.sprite.groupcollide(
             self.player.bullets, 
             self.metalls, 
-            True, 
+            True,                           # bullet disappears on hit
             False,
             collided=hitbox_collide         # use hitbox for collisions instead of rects
         )
@@ -197,10 +205,23 @@ class Game:
             for metall in metalls:
                 # if metall is not guarding, it takes damage/dies
                 if not metall.guarding:
-                    metall.kill()
+                    logger.info("Metall takes damage from player bullet!")
+                    metall.health -= 1
+                    if metall.health <= 0:
+                        self. drop_reward_item(metall)
+                        metall.kill()
                 else:
-                    logger.debug("Bullet pinge off Metall's helmet!")
-                    logger.debug("Optional: spawn a spark particle here")
+                    # play the sound here. Make it more dynamic by varying volume
+                    clink = AssetManager.get_sound("clink")
+                    clink.set_volume(random.uniform(0.7, 1.0))      # random volume between 70% - 100%
+                    clink.play()
+
+                    # spawn sparks at the collision point
+                    for _ in range(8):
+                        # spawn at bullet's current position 
+                        self.particles.add(Spark(bullet.rect.centerx, bullet.rect.centery))
+                    logger.debug("Bullet pinged off Metall's helmet!")
+
 
     def __check_player_metall_collision(self):
         """Player collision with Metall"""
@@ -234,6 +255,13 @@ class Game:
                     logger.debug("Bullet hit an indestructable wall.")
 
 
+    def drop_reward_item(self, character):
+        random_number = random.randint(1, 100) # inclusive of 100 
+        if 0 < random_number <= 20:
+            self.reward_items.add(RewardItem(character.position.x, character.position.y, "big_life_energy"))
+        elif 20 < random_number <= 50:
+            self.reward_items.add(RewardItem(character.position.x, character.position.y, "life_energy"))
+        
 
     def draw(self):
         self.screen.fill(c.BACKGROUND_COLOR)
@@ -258,6 +286,7 @@ class Game:
             #self.player.draw_debug(self.screen)
 
         self.player.bullets.draw(self.screen) 
+        self.particles.draw(self.screen)
         self.player.draw_health_bar(self.screen)
         pygame.display.flip()
 

@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 
 
 from .assetManager import AssetManager
-from . import constants as c
+from .constants import GRAVITY, FRICTION, ACCELERATION
 from .bullet import Bullet
 
 import logging 
@@ -19,12 +19,20 @@ class Player(pygame.sprite.Sprite):
     HITBOX_WIDTH =  24
     HITBOX_HEIGHT = 40 
 
+    MAX_SPEED = 5          # Speed cap
+    MIN_SPEED = 0.1        # Threshold to stop "creeping"
+
     MAX_HEALTH = 100
-    HEALTH_BAR_LENGTH = 200
-    HEALTH_RATIO = MAX_HEALTH / HEALTH_BAR_LENGTH
+    HEALTH_BAR_WIDTH = 200
+    HEALTH_BAR_HEIGHT = 15
+    HEALTH_RATIO = MAX_HEALTH / HEALTH_BAR_WIDTH
+
+    # jumping 
+    MIN_JUMP_HEIGHT = 4
+    JUMP_STRENGTH = 14     # How high the player launches (negative velocity)
 
     # Timing Constants 
-    COYOTE_TIME_MS = 100    # grace period for jumping after walking off ledge
+    COYOTE_TIME_MS = 150    # grace period for jumping after walking off ledge
 
     def __init__(self, x, y):
         # call the Sprite parent constructor
@@ -136,7 +144,7 @@ class Player(pygame.sprite.Sprite):
         # 1. Determine the state 
         if self.jumping:
             state = f"jump_{shoot_part}{self.direction}" 
-        elif moving_this_frame and abs(self.velocity.x) > c.MIN_SPEED:
+        elif moving_this_frame and abs(self.velocity.x) > self.MIN_SPEED:
             state = f"{shoot_part if self.is_shooting else "walk_"}{self.direction}"
         else:
             state = f"{shoot_part if self.is_shooting else "idle_"}{self.direction}"
@@ -169,7 +177,7 @@ class Player(pygame.sprite.Sprite):
 
     def perform_jump(self):
         """The actual physics of jumping."""
-        self.velocity.y = -c.JUMP_STRENGTH 
+        self.velocity.y = -self.JUMP_STRENGTH 
         self.jumping = True 
         self.last_grounded_time = 0 
         self.jump_buffer_time = 0 # Clear buffer so we don't double jump
@@ -178,8 +186,8 @@ class Player(pygame.sprite.Sprite):
     def stop_jump(self):
         """Called when jump key is released to allow variable jump height"""
         # if moving upwards, reduce the upward velocity significantly 
-        if self.velocity.y < -c.MIN_JUMP_HEIGHT:
-            self.velocity.y = -c.MIN_JUMP_HEIGHT 
+        if self.velocity.y < -self.MIN_JUMP_HEIGHT:
+            self.velocity.y = -self.MIN_JUMP_HEIGHT 
 
     def shoot(self):
         self.is_shooting = True 
@@ -209,34 +217,35 @@ class Player(pygame.sprite.Sprite):
 
     def draw_health_bar(self, surface):
         # health bar position (top left)
-        bar_x, bar_y = 20, 20 
+        pos = 20, 20 
+        dimensions = self.HEALTH_BAR_WIDTH, self.HEALTH_BAR_HEIGHT
 
         # draw background 
-        pygame.draw.rect(surface, (0, 0, 0), (bar_x, bar_y, self.HEALTH_BAR_LENGTH, 15))
+        pygame.draw.rect(surface, (0, 0, 0), (*pos, *dimensions))
 
         # draw foreground 
         health_width = self.current_health / self.HEALTH_RATIO
-        pygame.draw.rect(surface, (0, 255, 0), (bar_x, bar_y, health_width, 15))
+        pygame.draw.rect(surface, (0, 255, 0), (*pos, health_width, self.HEALTH_BAR_HEIGHT))
 
         # draw border 
-        pygame.draw.rect(surface, (255, 255, 255), (bar_x, bar_y, self.HEALTH_BAR_LENGTH, 15), 2)
+        pygame.draw.rect(surface, (255, 255, 255), (*pos, *dimensions), 2)
 
     def update(self, tiles, moving):
         # apply gravity 
-        self.velocity.y += c.GRAVITY
+        self.velocity.y += GRAVITY
 
         # Apply sliding friction only if player isn't pressing a key
         if not moving:
-            self.velocity.x *= c.FRICTION
+            self.velocity.x *= FRICTION
             # When velocity gets very small, zero it to prevent "creeping"
-            if abs(self.velocity.x) < c.MIN_SPEED:
+            if abs(self.velocity.x) < self.MIN_SPEED:
                 self.velocity.x = 0
 
         # Cap maximum speed 
-        if self.velocity.x > c.MAX_SPEED:
-            self.velocity.x = c.MAX_SPEED 
-        elif self.velocity.x < -c.MAX_SPEED:
-            self.velocity.x = -c.MAX_SPEED 
+        if self.velocity.x > self.MAX_SPEED:
+            self.velocity.x = self.MAX_SPEED 
+        elif self.velocity.x < -self.MAX_SPEED:
+            self.velocity.x = -self.MAX_SPEED 
 
         
         # X-AXIS Movement and Collision

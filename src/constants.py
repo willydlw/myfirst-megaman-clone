@@ -14,23 +14,10 @@ PLAYER_START_Y = SCREEN_HEIGHT / 2
 
 # Acceleration and Velocity
 GRAVITY = 0.8          # How fast the player falls back down
-JUMP_STRENGTH = 14     # How high the player launches (negative velocity)
+
 ACCELERATION = 0.5     # How fast they speed up on X-axis
 FRICTION = 0.9         # How fast they slide to a stop
-MAX_SPEED = 5          # Speed cap
-MIN_SPEED = 0.1        # Threshold to stop "creeping"
 
-
-# enemy variables 
-METALL_HITBOX_WIDTH = 36
-METALL_HITBOX_HEIGHT = 30 
-
-METALL_DETECTION_RANGE = 250  # Distance to wake up the Metall
-
-METALL_BULLET_WIDTH = 12
-METALL_BULLET_HEIGHT = METALL_BULLET_WIDTH 
-METALL_BULLET_VELOCITY_X = 2 
-METALL_BULLET_VELOCITY_Y = METALL_BULLET_VELOCITY_X 
 
 
 # tiles
@@ -38,12 +25,6 @@ TILE_SIZE = 32
 
 # colors
 BACKGROUND_COLOR = (255,255,255) #(25, 52, 230)
-
-
-# jumping 
-MIN_JUMP_HEIGHT = 4
-
-COYOTE_DURATION = 150   # milliseconds of grace period
 
 
 # mapping symbols 

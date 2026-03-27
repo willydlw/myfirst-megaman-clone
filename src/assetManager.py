@@ -11,10 +11,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class NullSound:
+    """A fake sound object that does nothing when called."""
+    def play(self, *args, **kwargs): return None 
+    def stop(self, *args, **kwargs): pass 
+    def set_volume(self, *args, **kwargs): pass 
+    def get_volume(self): return 0.0 
+
+
 class AssetManager:
     # 1. Define class-level dictionaries (static variables)
     _images = {}
     _fonts = {}
+    _sounds = {}
 
     @classmethod 
     def load_all(cls, config_path):
@@ -58,6 +67,11 @@ class AssetManager:
         for name, data in config.get("fonts", {}).items():
             full_path = BASE_DIR / data.get("path", "")
             cls._fonts[name] = cls._safe_load_font(full_path, data.get("size", 24))
+
+        # 5. Load sounds 
+        for name, data in config.get("sounds", {}).items():
+            full_path = BASE_DIR / data.get("path", "")
+            cls.fonts[name] = cls._safe_load_sound(full_path)
             
     @staticmethod 
     def _safe_load_image(path):
@@ -83,6 +97,18 @@ class AssetManager:
             logger.warning(f"Font missing at {path}. Using system default.")
             return pygame.font.SysFont("Arial", size)
 
+    @staticmethod
+    def _safe_load_sound(path):
+        """Tries to load a sound; returns ??? on failure"""
+        try:
+            # Check if mixer is initialized to avoid errors 
+            if not pygame.mixer or not pygame.mixer.get_init():
+                pygame.mixer_init()
+            return pygame.mixer.Sound(str(path))
+        except (pygame.error, FileNotFoundError, Exception) as e:
+            logger.warning(f"Sound missing at {path}. {e} Using NullSound.")
+            return NullSound()
+        
     @classmethod
     def get_image(cls, name):
         return cls._images.get(name)
@@ -90,3 +116,8 @@ class AssetManager:
     @classmethod
     def get_font(cls, name):
         return cls._fonts.get(name)
+    
+    @classmethod 
+    def get_sound(cls, name):
+        """Retrieves a sound; returns NullSound if key doesn't exist"""
+        return cls._sounds.get(name, NullSound())
