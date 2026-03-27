@@ -14,6 +14,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Player(pygame.sprite.Sprite):
+
+    # Class Constants by convention
+    HITBOX_WIDTH =  24
+    HITBOX_HEIGHT = 40 
+
+    MAX_HEALTH = 100
+    HEALTH_BAR_LENGTH = 200
+    HEALTH_RATIO = MAX_HEALTH / HEALTH_BAR_LENGTH
+
+    # Timing Constants 
+    COYOTE_TIME_MS = 100    # grace period for jumping after walking off ledge
+
     def __init__(self, x, y):
         # call the Sprite parent constructor
         super().__init__()
@@ -24,11 +36,15 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.direction = "right"
 
+        # Health System
+        self.current_health = Player.MAX_HEALTH
+        
+
         # To add Coyote Time, you need a timer that tracks how long it has been since 
         # the player was last touching the ground. If the player walks off a ledge, 
         # they get a small window (usually 100–200ms) where they can still trigger a jump.
         self.last_grounded_time = 0
-        self.coyote_duration = c.COYOTE_DURATION  # milliseconds of grace period
+        self.coyote_duration = Player.COYOTE_TIME_MS
 
         # Jump buffering: remember" a jump press that happened slightly before the 
         # player touched the ground. If they land within a small window (usually 100–150ms) 
@@ -80,7 +96,7 @@ class Player(pygame.sprite.Sprite):
         current_state = f"idle_{self.direction}"
 
         # self.hitbox is for Collisions
-        self.hitbox = pygame.Rect(x, y, c.PLAYER_HITBOX_WIDTH, c.PLAYER_HITBOX_HEIGHT)
+        self.hitbox = pygame.Rect(x, y, Player.HITBOX_WIDTH, Player.HITBOX_HEIGHT)
 
         # Set self.image and self.rect based on current state
         self.image = self.animations[current_state][0]
@@ -180,12 +196,30 @@ class Player(pygame.sprite.Sprite):
             if current_time - self.last_hit_time > self.invincibility_duration:
                 self.is_invincible = False 
 
-    def take_damage(self):
+    def take_damage(self, amount=20):
         if not self.is_invincible:
+            self.current_health -= amount 
+            if self.current_health < 0:
+                self.current_health = 0 
+
             self.is_invincible = True 
             self.last_hit_time = pygame.time.get_ticks() 
-            logger.info("Player hit! Invincibility started")
-            logger.info("TODO: add health reduction here")
+            logger.info("Player hit! Health: {self.current_health}")
+    
+
+    def draw_health_bar(self, surface):
+        # health bar position (top left)
+        bar_x, bar_y = 20, 20 
+
+        # draw background 
+        pygame.draw.rect(surface, (0, 0, 0), (bar_x, bar_y, self.HEALTH_BAR_LENGTH, 15))
+
+        # draw foreground 
+        health_width = self.current_health / self.HEALTH_RATIO
+        pygame.draw.rect(surface, (0, 255, 0), (bar_x, bar_y, health_width, 15))
+
+        # draw border 
+        pygame.draw.rect(surface, (255, 255, 255), (bar_x, bar_y, self.HEALTH_BAR_LENGTH, 15), 2)
 
     def update(self, tiles, moving):
         # apply gravity 

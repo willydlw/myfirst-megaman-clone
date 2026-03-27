@@ -258,10 +258,11 @@ class Game:
             #self.player.draw_debug(self.screen)
 
         self.player.bullets.draw(self.screen) 
+        self.player.draw_health_bar(self.screen)
         pygame.display.flip()
 
 
 
 def hitbox_collide(sprite_a, sprite_b):
-    """Callbackk to chec collision using the .hitbox attribute."""
+    """Callbackk to check collision using the .hitbox attribute."""
     return sprite_a.hitbox.colliderect(sprite_b.hitbox)
