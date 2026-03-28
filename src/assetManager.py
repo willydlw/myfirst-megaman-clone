@@ -71,7 +71,7 @@ class AssetManager:
         # 5. Load sounds 
         for name, data in config.get("sounds", {}).items():
             full_path = BASE_DIR / data.get("path", "")
-            cls.fonts[name] = cls._safe_load_sound(full_path)
+            cls.sounds[name] = cls._safe_load_sound(full_path)
             
     @staticmethod 
     def _safe_load_image(path):
@@ -121,3 +121,11 @@ class AssetManager:
     def get_sound(cls, name):
         """Retrieves a sound; returns NullSound if key doesn't exist"""
         return cls._sounds.get(name, NullSound())
+    
+    @classmethod
+    def __str__(cls):
+        summary = [f"AssetManager Status:"]
+        summary.append(f"  Images ({len(cls._images)}): {list(cls._images.keys())}")
+        summary.append(f"  Fonts  ({len(cls._fonts)}): {list(cls._fonts.keys())}")
+        summary.append(f"  Sounds ({len(cls._sounds)}): {list(cls._sounds.keys())}")
+        return "\n".join(summary)
